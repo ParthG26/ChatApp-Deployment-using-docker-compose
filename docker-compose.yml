@@ -1,0 +1,54 @@
+version: "3.9"
+
+services:
+  database:
+    build:
+      context: ./Database
+      dockerfile: dockerfile
+    container_name: Database
+    environment:
+      MYSQL_ROOT_PASSWORD: chatapp_admin
+    volumes:
+      - chatapp_db:/var/lib/mysql
+    ports:
+      - 3306:3306
+    networks:
+      - chatapp_net
+
+  backend:
+    build:
+      context: ./Backend
+      dockerfile: dockerfile
+    container_name: Backend
+    ports:
+      - 8000:8000
+    environment:
+      DB_NAME: ChatApp
+      DB_PORT: 3306
+      DB_USER: chat_user
+      DB_PASSWORD: chatapp_admin
+    depends_on:
+      - database
+    networks:
+      - chatapp_net
+    
+  frontend:
+    build:
+      context: ./Frontend
+      dockerfile: dockerfile
+    container_name: Frontend
+    ports:
+      - 80:80
+    depends_on:
+      - backend
+    networks:
+      - chatapp_net
+
+volumes:
+  chatapp_db:
+
+networks:
+  chatapp_net:
+
+
+
